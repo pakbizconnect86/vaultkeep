@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vaultkeep — Your passwords, encrypted, local, yours.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0B1015; --panel:#131A22; --panel-2:#182029; --line:#232D38;
+    --text:#E7ECF1; --muted:#8B98A6; --teal:#4FD1C5; --teal-dim:#2E7C74;
+    --gold:#D9B36C; --danger:#E2626B;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:
+      radial-gradient(circle at 15% 0%, rgba(79,209,197,0.08), transparent 45%),
+      radial-gradient(circle at 85% 30%, rgba(217,179,108,0.05), transparent 40%),
+      var(--ink);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    line-height:1.6;
+  }
+  a{ color:inherit; }
+  .wrap{ max-width:960px; margin:0 auto; padding:0 24px; }
+
+  /* NAV */
+  nav{ display:flex; align-items:center; justify-content:space-between; padding:22px 0; }
+  .logo{ font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:19px; display:flex; align-items:center; gap:8px; }
+  .logo .dot{ width:8px; height:8px; border-radius:50%; background:var(--teal); box-shadow:0 0 10px 2px rgba(79,209,197,.6); }
+  .logo span{ color:var(--teal); }
+  nav .links{ display:flex; gap:28px; font-size:14px; color:var(--muted); }
+  nav .links a:hover{ color:var(--text); }
+  .gh-btn{
+    background:var(--panel); border:1px solid var(--line); padding:8px 16px; border-radius:8px;
+    font-size:13.5px; font-weight:600; display:flex; align-items:center; gap:7px;
+  }
+  .gh-btn:hover{ border-color:var(--teal); color:var(--teal); }
+
+  /* HERO */
+  .hero{ padding:64px 0 56px; text-align:center; }
+  .badge{
+    display:inline-flex; align-items:center; gap:7px; background:var(--panel);
+    border:1px solid var(--line); padding:6px 14px; border-radius:20px; font-size:12.5px;
+    color:var(--muted); margin-bottom:26px;
+  }
+  .badge .dot{ width:6px; height:6px; border-radius:50%; background:var(--teal); }
+  h1{
+    font-family:'Space Grotesk', sans-serif; font-size:44px; font-weight:700;
+    line-height:1.15; letter-spacing:-.01em; max-width:680px; margin:0 auto 18px;
+  }
+  h1 span{ color:var(--teal); }
+  .hero p{ color:var(--muted); font-size:16.5px; max-width:520px; margin:0 auto 34px; }
+  .cta-row{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+  .btn{
+    padding:13px 24px; border-radius:9px; font-weight:600; font-size:14.5px;
+    display:inline-flex; align-items:center; gap:8px; border:1px solid transparent;
+  }
+  .btn-primary{ background:var(--teal); color:#062521; }
+  .btn-primary:hover{ opacity:.9; }
+  .btn-secondary{ background:transparent; border-color:var(--line); color:var(--text); }
+  .btn-secondary:hover{ border-color:var(--muted); }
+
+  /* PREVIEW CARD */
+  .preview{
+    margin:56px auto 0; max-width:360px; background:var(--panel);
+    border:1px solid var(--line); border-radius:16px; padding:22px;
+    box-shadow:0 30px 80px -20px rgba(0,0,0,.6);
+  }
+  .preview-top{ display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+  .preview-brand{ font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:14px; }
+  .preview-brand span{ color:var(--teal); }
+  .lockchip{ font-size:10.5px; color:var(--muted); background:var(--panel-2); padding:4px 8px; border-radius:6px; border:1px solid var(--line); }
+  .p-entry{ background:var(--panel-2); border:1px solid var(--line); border-radius:9px; padding:11px 12px; margin-bottom:8px; text-align:left; }
+  .p-entry .site{ font-weight:600; font-size:13px; margin-bottom:5px; }
+  .p-entry .row{ display:flex; align-items:center; gap:6px; font-family:'JetBrains Mono', monospace; font-size:11.5px; color:var(--muted); }
+  .p-entry .row .val{ color:var(--text); }
+  .p-entry .row .btn-mini{ margin-left:auto; color:var(--teal); font-family:'Inter',sans-serif; font-size:10px; }
+
+  /* SECTIONS */
+  section{ padding:70px 0; border-top:1px solid var(--line); }
+  .section-head{ text-align:center; margin-bottom:44px; }
+  .eyebrow{ color:var(--teal); font-size:12.5px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; margin-bottom:10px; }
+  h2{ font-family:'Space Grotesk', sans-serif; font-size:28px; font-weight:600; }
+  .section-head p{ color:var(--muted); font-size:15px; max-width:480px; margin:12px auto 0; }
+
+  .grid3{ display:grid; grid-template-columns:repeat(3, 1fr); gap:18px; }
+  .feat{ background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:24px; }
+  .feat .icon{ width:38px; height:38px; border-radius:9px; background:var(--panel-2); display:flex; align-items:center; justify-content:center; margin-bottom:16px; color:var(--teal); font-size:18px; }
+  .feat h3{ font-size:15.5px; margin-bottom:8px; font-family:'Space Grotesk', sans-serif; }
+  .feat p{ color:var(--muted); font-size:13.5px; }
+
+  /* STEPS */
+  .steps{ display:flex; flex-direction:column; gap:0; max-width:620px; margin:0 auto; }
+  .step{ display:flex; gap:18px; padding:20px 0; border-bottom:1px solid var(--line); }
+  .step:last-child{ border-bottom:none; }
+  .step-num{
+    width:32px; height:32px; border-radius:50%; background:var(--panel-2); border:1px solid var(--line);
+    color:var(--teal); font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:13.5px;
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .step h4{ font-size:15px; margin-bottom:4px; }
+  .step p{ color:var(--muted); font-size:13.5px; }
+  .step code{ background:var(--panel); border:1px solid var(--line); padding:1px 6px; border-radius:5px; font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--gold); }
+
+  /* PRIVACY */
+  .privacy-box{
+    background:var(--panel); border:1px solid var(--teal-dim); border-radius:14px; padding:32px;
+    max-width:640px; margin:0 auto; text-align:center;
+  }
+  .privacy-box .icon{ font-size:30px; margin-bottom:14px; }
+  .privacy-box p{ color:var(--muted); font-size:14.5px; margin-bottom:6px; }
+  .privacy-list{ list-style:none; margin-top:18px; text-align:left; display:inline-block; }
+  .privacy-list li{ font-size:13.5px; color:var(--text); margin-bottom:9px; padding-left:22px; position:relative; }
+  .privacy-list li::before{ content:"✓"; color:var(--teal); position:absolute; left:0; font-weight:700; }
+
+  footer{ padding:40px 0; text-align:center; color:var(--muted); font-size:13px; border-top:1px solid var(--line); }
+  footer a{ color:var(--teal); text-decoration:none; }
+
+  @media (max-width:720px){
+    h1{ font-size:32px; }
+    .grid3{ grid-template-columns:1fr; }
+    nav .links{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <nav>
+    <div class="logo"><span class="dot"></span>Vault<span>keep</span></div>
+    <div class="links">
+      <a href="#features">Features</a>
+      <a href="#install">Install</a>
+      <a href="#privacy">Privacy</a>
+    </div>
+    <a class="gh-btn" href="https://github.com/pakbizconnect86/vaultkeep" target="_blank">
+      ⭐ GitHub
+    </a>
+  </nav>
+
+  <div class="hero">
+    <div class="badge"><span class="dot"></span> Free &amp; open source · No servers · No tracking</div>
+    <h1>Your passwords, <span>encrypted</span>, local, yours.</h1>
+    <p>Vaultkeep is a lightweight browser extension that auto-saves your logins the moment you sign in — locked behind AES-256 encryption that only you can unlock.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="https://github.com/pakbizconnect86/vaultkeep/archive/refs/heads/main.zip">⬇ Download for Chrome/Edge</a>
+      <a class="btn btn-secondary" href="https://github.com/pakbizconnect86/vaultkeep" target="_blank">View source on GitHub</a>
+    </div>
+
+    <div class="preview">
+      <div class="preview-top">
+        <div class="preview-brand">Vault<span>keep</span></div>
+        <div class="lockchip">🔒 Unlocked</div>
+      </div>
+      <div class="p-entry">
+        <div class="site">Fiverr</div>
+        <div class="row"><span class="val">handwriiter@gmail.com</span><span class="btn-mini">Copy</span></div>
+        <div class="row"><span class="val">••••••••</span><span class="btn-mini">Show</span></div>
+      </div>
+      <div class="p-entry">
+        <div class="site">Payoneer</div>
+        <div class="row"><span class="val">ubaid.dev@gmail.com</span><span class="btn-mini">Copy</span></div>
+        <div class="row"><span class="val">••••••••</span><span class="btn-mini">Show</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section id="features">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Why Vaultkeep</div>
+      <h2>Built to be simple, and safe by default</h2>
+      <p>No accounts, no cloud, no monthly fee. Just a vault only you can open.</p>
+    </div>
+    <div class="grid3">
+      <div class="feat">
+        <div class="icon">⚡</div>
+        <h3>Auto-capture</h3>
+        <p>Log into any site and Vaultkeep quietly picks up the credentials — no copy-pasting into a separate app.</p>
+      </div>
+      <div class="feat">
+        <div class="icon">🔐</div>
+        <h3>AES-256 encryption</h3>
+        <p>Every entry is encrypted with a key derived from your master password using PBKDF2 — 150,000 iterations.</p>
+      </div>
+      <div class="feat">
+        <div class="icon">📦</div>
+        <h3>100% local storage</h3>
+        <p>Data lives only in your browser's storage. There is no backend, no API, no server that could ever be breached.</p>
+      </div>
+      <div class="feat">
+        <div class="icon">🎲</div>
+        <h3>Password generator</h3>
+        <p>Create strong, random 16-character passwords in one click when signing up for new accounts.</p>
+      </div>
+      <div class="feat">
+        <div class="icon">👁</div>
+        <h3>Show / hide / copy</h3>
+        <p>Passwords stay masked by default. Reveal or copy to clipboard only when you choose to.</p>
+      </div>
+      <div class="feat">
+        <div class="icon">🧩</div>
+        <h3>Open source</h3>
+        <p>Every line of code is public on GitHub — read it yourself, fork it, or verify there's nothing sketchy going on.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="install">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Get started</div>
+      <h2>Install in under two minutes</h2>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div>
+          <h4>Download the code</h4>
+          <p>Grab the ZIP from <a href="https://github.com/pakbizconnect86/vaultkeep" target="_blank" style="color:var(--teal)">GitHub</a> and extract it anywhere on your computer.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div>
+          <h4>Open your browser's extensions page</h4>
+          <p>Chrome or Edge: go to <code>chrome://extensions</code> (or <code>edge://extensions</code>).</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div>
+          <h4>Turn on Developer mode</h4>
+          <p>You'll find the toggle in the top-right corner of the extensions page.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div>
+          <h4>Click "Load unpacked"</h4>
+          <p>Select the extracted <code>vaultkeep</code> folder. The extension icon will appear in your toolbar.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div>
+          <h4>Set your master password</h4>
+          <p>Click the icon, create a master password, and you're ready to go. Don't forget it — it can't be recovered.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="privacy">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Trust</div>
+      <h2>We can't see your passwords. Neither can anyone else.</h2>
+    </div>
+    <div class="privacy-box">
+      <div class="icon">🛡️</div>
+      <p>Vaultkeep has no backend server, no analytics, and no network requests of any kind.</p>
+      <ul class="privacy-list">
+        <li>All data stored only in your own browser</li>
+        <li>Master password never leaves your device</li>
+        <li>No account signup, no email required</li>
+        <li>Fully open-source — verify it yourself</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    Vaultkeep is free and open source. Built by <a href="https://github.com/pakbizconnect86" target="_blank">Ubaid</a> ·
+    <a href="https://github.com/pakbizconnect86/vaultkeep" target="_blank">View on GitHub</a>
+  </div>
+</footer>
+
+</body>
+</html>
