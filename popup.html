@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Vaultkeep</title>
+<style>
+  :root{
+    --ink:#0B1015; --panel:#131A22; --panel-2:#182029; --line:#232D38;
+    --text:#E7ECF1; --muted:#8B98A6; --teal:#4FD1C5; --teal-dim:#2E7C74;
+    --danger:#E2626B; --gold:#D9B36C;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    width:340px; min-height:200px; background:var(--ink); color:var(--text);
+    font-family:-apple-system,'Inter',sans-serif;
+  }
+  h1.brand{ font-size:16px; font-weight:700; padding:14px 16px 10px; letter-spacing:.02em; }
+  h1.brand span{ color:var(--teal); }
+
+  /* gate */
+  #gate{ padding:6px 16px 18px; display:flex; flex-direction:column; gap:10px; }
+  .sub{ color:var(--muted); font-size:12px; line-height:1.5; margin-bottom:4px; }
+  input[type=password], input[type=text]{
+    width:100%; background:var(--panel); border:1px solid var(--line); color:var(--text);
+    font-size:13px; padding:10px 11px; border-radius:7px; outline:none;
+  }
+  input:focus{ border-color:var(--teal); }
+  button{ font-family:inherit; font-weight:600; font-size:13px; border:none; cursor:pointer; border-radius:7px; }
+  .btn-primary{ background:var(--teal); color:#062521; padding:10px; }
+  .btn-primary:hover{ opacity:.9; }
+  .btn-ghost{ background:transparent; color:var(--muted); border:1px solid var(--line); padding:8px; }
+  .err{ color:var(--danger); font-size:11.5px; min-height:14px; }
+  .mode-toggle{ font-size:11.5px; color:var(--muted); }
+  .mode-toggle a{ color:var(--teal); cursor:pointer; }
+
+  /* app */
+  #app{ display:none; padding:0 14px 14px; }
+  .topbar{ display:flex; justify-content:space-between; align-items:center; padding:0 0 8px; }
+  .lock-btn{ background:var(--panel); color:var(--muted); border:1px solid var(--line); padding:6px 10px; font-size:11px; }
+  .searchrow{ display:flex; gap:6px; margin-bottom:8px; }
+  .searchrow input{ flex:1; }
+  .add-btn{ background:var(--panel-2); color:var(--teal); border:1px solid var(--teal-dim); padding:0 12px; font-size:17px; }
+
+  #pendingBox{ display:none; background:var(--panel-2); border:1px solid var(--gold); border-radius:8px; padding:10px; margin-bottom:10px; }
+  #pendingBox h3{ font-size:12px; color:var(--gold); margin-bottom:6px; }
+  .pend-item{ display:flex; justify-content:space-between; align-items:center; font-size:12px; padding:5px 0; border-top:1px solid var(--line); }
+  .pend-item:first-of-type{ border-top:none; }
+  .pend-item button{ background:var(--teal); color:#062521; padding:4px 8px; font-size:11px; }
+  .pend-item .discard{ background:transparent; color:var(--muted); margin-left:5px; padding:4px 6px; }
+
+  #list{ max-height:320px; overflow-y:auto; }
+  .entry{ background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:10px 11px; margin-bottom:7px; }
+  .entry-top{ display:flex; justify-content:space-between; align-items:center; }
+  .entry-site{ font-weight:600; font-size:13px; }
+  .entry-actions button{ background:none; color:var(--muted); font-size:12px; padding:2px 5px; }
+  .entry-actions button:hover{ color:var(--danger); }
+  .entry-row{ display:flex; align-items:center; gap:6px; margin-top:5px; font-size:11.5px; color:var(--muted); font-family:monospace; }
+  .entry-row .val{ color:var(--text); }
+  .entry-row button{ background:none; color:var(--muted); font-size:10.5px; margin-left:auto; }
+  .entry-row button:hover{ color:var(--teal); }
+  .empty{ text-align:center; color:var(--muted); padding:30px 10px; font-size:12px; }
+
+  .overlay{ display:none; position:fixed; inset:0; background:rgba(6,9,12,.75); align-items:center; justify-content:center; }
+  .overlay.show{ display:flex; }
+  .modal{ background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:16px; width:290px; }
+  .modal h2{ font-size:14px; margin-bottom:10px; }
+  .field{ margin-bottom:9px; }
+  .field label{ font-size:10.5px; color:var(--muted); text-transform:uppercase; display:block; margin-bottom:4px; }
+  .pw-row{ display:flex; gap:6px; }
+  .pw-row input{ flex:1; }
+  .gen-btn{ background:var(--panel-2); color:var(--gold); border:1px solid var(--line); padding:0 8px; font-size:10.5px; }
+  .modal-actions{ display:flex; gap:6px; margin-top:12px; }
+  .modal-actions button{ flex:1; padding:9px; }
+  .saved-tag{ font-size:10.5px; color:var(--teal); opacity:0; transition:opacity .3s; height:12px; margin-bottom:4px; }
+  .saved-tag.show{ opacity:1; }
+</style>
+</head>
+<body>
+
+<h1 class="brand">Vault<span>keep</span></h1>
+
+<div id="gate">
+  <p class="sub" id="gateSub"></p>
+  <input type="password" id="masterInput" placeholder="Master password" autocomplete="off">
+  <input type="password" id="masterInput2" placeholder="Confirm master password" autocomplete="off" style="display:none;">
+  <div class="err" id="gateErr"></div>
+  <button class="btn-primary" id="gateBtn">Create Vault</button>
+  <div class="mode-toggle" id="modeToggle"></div>
+</div>
+
+<div id="app">
+  <div class="topbar">
+    <span style="font-size:11px;color:var(--muted);">Unlocked</span>
+    <button class="lock-btn" id="lockBtn">🔒 Lock</button>
+  </div>
+
+  <div id="pendingBox">
+    <h3>Naye logins mile — save karein?</h3>
+    <div id="pendingList"></div>
+  </div>
+
+  <div class="searchrow">
+    <input type="text" id="searchInput" placeholder="Search...">
+    <button class="add-btn" id="openAdd">+</button>
+  </div>
+  <div class="saved-tag" id="savedTag">Saved</div>
+  <div id="list"></div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <h2 id="modalTitle">Add entry</h2>
+    <div class="field"><label>Site</label><input type="text" id="fSite"></div>
+    <div class="field"><label>Username</label><input type="text" id="fUser"></div>
+    <div class="field"><label>Password</label>
+      <div class="pw-row"><input type="text" id="fPass"><button class="gen-btn" id="genBtn">Gen</button></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ghost" id="cancelBtn">Cancel</button>
+      <button class="btn-primary" id="saveBtn">Save</button>
+    </div>
+  </div>
+</div>
+
+<script src="crypto.js"></script>
+<script src="popup.js"></script>
+</body>
+</html>
